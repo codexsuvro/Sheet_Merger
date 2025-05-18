@@ -70,7 +70,7 @@ const Body: React.FC = () => {
     };
 
     return (
-        <div className="h-[88vh] w-full flex flex-col gap-12 justify-center items-center">
+        <div className="h-[88vh] pt-16 w-full flex flex-col gap-12 justify-center items-center">
             <div className="h-[280px] w-[500px] border-[#5151db] border-4 border-dashed rounded-3xl flex flex-col gap-5 justify-center items-center">
                 <Button
                     component="label"
