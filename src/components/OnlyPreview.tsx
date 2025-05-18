@@ -30,15 +30,26 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 export default function EntityTableWithDialog() {
     const [open, setOpen] = useState(false);
     const [selectedDescription, setSelectedDescription] = useState('');
+    const [dialogTitle, setDialogTitle] = useState('');
 
-    const handleOpenDialog = (desc: string) => {
+    const handleOpenDialog = (desc: string, title: string) => {
         setSelectedDescription(desc);
+        setDialogTitle(title);
         setOpen(true);
     };
 
     const handleCloseDialog = () => {
         setOpen(false);
         setSelectedDescription('');
+        setDialogTitle('');
+    };
+
+    const renderField = (text: string, label: string) => {
+        return renderTruncatedDescription({
+            text,
+            onClick: () => handleOpenDialog(text, label),
+            wordLimit: 12
+        });
     };
 
     return (
@@ -60,14 +71,10 @@ export default function EntityTableWithDialog() {
                                 <TableRow key={row.id} hover>
                                     <TableCell align='center' sx={{ borderRight: '1px solid #ccc' }}>{row.entityName}</TableCell>
                                     <TableCell align='center' sx={{ borderRight: '1px solid #ccc' }}>{row.attributeName}</TableCell>
-                                    <TableCell align='center' sx={{ borderRight: '1px solid #ccc' }}>{row.businessMeaningEntity}</TableCell>
-                                    <TableCell align='center' sx={{ borderRight: '1px solid #ccc' }}>{row.businessMeaningAttribute}</TableCell>
+                                    <TableCell align='center' sx={{ borderRight: '1px solid #ccc' }}>{renderField(row.businessMeaningEntity, "Business Meaning Entity")}</TableCell>
+                                    <TableCell align='center' sx={{ borderRight: '1px solid #ccc' }}>{renderField(row.businessMeaningAttribute, "Business Meaning Attribute")}</TableCell>
                                     <TableCell align='center'>
-                                        {renderTruncatedDescription({
-                                            text: row.description,
-                                            onClick: handleOpenDialog,
-                                            wordLimit: 10
-                                        })}
+                                        {renderField(row.description, "Description")}
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -83,7 +90,7 @@ export default function EntityTableWithDialog() {
                 open={open}
             >
                 <DialogTitle sx={{ m: 0, p: 2 }} className='flex items-center justify-between'>
-                    <p className='font-serif font-bold text-[#1976d2]'>Full Description</p>
+                    <p className='font-serif font-bold text-[#1976d2]'>{dialogTitle}</p>
                     <IconButton
                         aria-label="close"
                         onClick={handleCloseDialog}
