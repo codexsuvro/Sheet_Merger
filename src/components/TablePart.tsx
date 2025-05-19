@@ -6,7 +6,6 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableFooter,
   TableHead,
   TablePagination,
   TableRow,
@@ -14,6 +13,11 @@ import {
   Button,
   IconButton,
   useTheme,
+  styled,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
 } from '@mui/material';
 import {
   FirstPage,
@@ -21,6 +25,8 @@ import {
   KeyboardArrowLeft,
   KeyboardArrowRight,
 } from '@mui/icons-material';
+import { renderTruncatedDescription } from '../utils/helperFunctions';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface LocationState {
   state: {
@@ -79,6 +85,15 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   );
 }
 
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  '& .MuiDialogContent-root': {
+    padding: theme.spacing(2)
+  },
+  '& .MuiDialogActions-root': {
+    padding: theme.spacing(1)
+  }
+}));
+
 const TablePart: React.FC = () => {
   const location = useLocation() as LocationState;
   const navigate = useNavigate();
@@ -86,6 +101,30 @@ const TablePart: React.FC = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [open, setOpen] = useState(false);
+  const [selectedDescription, setSelectedDescription] = useState('');
+  const [dialogTitle, setDialogTitle] = useState('');
+
+  const handleOpenDialog = (desc: string, title: string) => {
+    setSelectedDescription(desc);
+    setDialogTitle(title);
+    setOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+    setSelectedDescription('');
+    setDialogTitle('');
+  };
+
+  const renderField = (text: string, label: string) => {
+    return renderTruncatedDescription({
+      text,
+      onClick: () => handleOpenDialog(text, label),
+      wordLimit: 12
+    });
+  };
 
   useEffect(() => {
     if (!data) {
@@ -172,7 +211,7 @@ const TablePart: React.FC = () => {
             ).map((row: any[], rowIndex: number) => (
               <TableRow key={rowIndex}>
                 {row.map((cell, colIndex) => (
-                  <TableCell key={colIndex}>{cell ?? ''}</TableCell>
+                  <TableCell key={colIndex}>{(colIndex === 4 || colIndex === 3 || colIndex === 2) ? renderField(cell, "Description") : cell ?? ''}</TableCell>
                 ))}
               </TableRow>
             ))}
@@ -197,6 +236,36 @@ const TablePart: React.FC = () => {
           component="div"
         />
       </div>
+      <BootstrapDialog
+        onClose={handleCloseDialog}
+        aria-labelledby="customized-dialog-title"
+        open={open}
+      >
+        <DialogTitle sx={{ m: 0, p: 2 }} className='flex items-center justify-between'>
+          <p className='font-serif font-bold text-[#1976d2]'>{dialogTitle}</p>
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseDialog}
+            sx={(theme) => ({
+              position: 'absolute',
+              right: 8,
+              top: 12,
+              color: theme.palette.grey[500],
+              '&:hover': {
+                backgroundColor: '#1976d2',
+                color: '#fff',
+              }
+            })}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Typography gutterBottom sx={{ whiteSpace: 'pre-wrap' }}>
+            {selectedDescription}
+          </Typography>
+        </DialogContent>
+      </BootstrapDialog>
 
     </div>
   );
